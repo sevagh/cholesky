@@ -1,0 +1,2 @@
+clang: clang -shared -Werror -Wall -O3 -lm -fPIC
+gcc: gcc -shared -Werror -Wall -O3 -lm -fPIC

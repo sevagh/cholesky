@@ -10,14 +10,6 @@ import ctypes
 import unittest
 
 
-RULES = {
-    'rosetta_code': {
-        'rosetta_code_clang': 'clang -shared -Werror -Wall -O3 -lm -fPIC',
-        'rosetta_code_gcc': 'gcc -shared -Werror -Wall -O3 -lm -fPIC'
-    }
-}
-
-
 class CholeskyTester(unittest.TestCase):
     def __init__(self, lib):
         self.cholesky = ctypes.cdll.LoadLibrary(lib)
@@ -65,13 +57,17 @@ def descend_dirs(base_dir, lib_dir):
     for d in os.listdir(base_dir):
         if os.path.isdir(d) and not d.startswith('.'):
             os.chdir(os.path.join(base_dir, d))
-            for rule_name, rule in RULES.get(d, {}).items():
-                output_artifact = 'lib{0}.so'.format(rule_name)
-                output_artifact_path = os.path.join(lib_dir,
-                                                    output_artifact)
-                sp.run('{0} -o {1} *.c'.format(
-                    rule, output_artifact_path), shell=True, check=True)
-                artifacts.append(output_artifact_path)
+            with open('./makerules', 'r') as f:
+                for l in f:
+                    lsplit = l[:-1].split(':')
+                    rule_name = '{0}_{1}'.format(d, lsplit[0])
+                    rule = lsplit[1]
+                    output_artifact = 'lib{0}.so'.format(rule_name)
+                    output_artifact_path = os.path.join(lib_dir,
+                                                        output_artifact)
+                    sp.run('{0} -o {1} *.c'.format(
+                        rule, output_artifact_path), shell=True, check=True)
+                    artifacts.append(output_artifact_path)
     return artifacts
 
 
