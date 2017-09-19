@@ -1,11 +1,12 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 from __future__ import print_function
 import os
 import shutil
 import subprocess as sp
 import sys
-from ctypes import cdll
+import ctypes
+from test.randmatrix import test_cholesky_lib
 
 RULES = {
     'rosetta_code': {
@@ -30,15 +31,8 @@ def descend_dirs(base_dir, lib_dir):
                 output_artifact = 'lib{0}.so'.format(rule_name)
                 output_artifact_path = os.path.join(lib_dir,
                                                     output_artifact)
-                ret = sp.call('{0} -o {1} *.c'.format(
-                    rule, output_artifact_path), shell=True)
-                if ret == 0:
-                    print('Successfully compiled {0}.\n\tOut artifact:\t{1}\n'.
-                          format(rule_name, output_artifact))
-                else:
-                    print('Failed to compile {0}:\n\t{1}'.format(
-                        rule_name, rule), file=sys.stderr)
-                    sys.exit(1)
+                sp.run('{0} -o {1} *.c'.format(
+                    rule, output_artifact_path), shell=True, check=True)
                 artifacts.append(output_artifact_path)
     return artifacts
 
@@ -59,5 +53,4 @@ if __name__ == '__main__':
     elif sys.argv[1] == 'test':
         artifacts = descend_dirs(base_dir, lib_dir)
         for a in artifacts:
-            lib = cdll.LoadLibrary(a)
-            lib.cholesky([], 0)
+            test_cholesky_lib(a)

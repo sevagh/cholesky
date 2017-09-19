@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
  
-double *cholesky(double *A, int n) {
-    double *L = (double*)calloc(n * n, sizeof(double));
+double *cholesky(double *A, double *L, int n) {
     if (L == NULL)
         exit(EXIT_FAILURE);
  
