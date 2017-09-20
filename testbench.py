@@ -43,8 +43,7 @@ class CholeskyTester(unittest.TestCase):
             prev_time = 0.0
             divide_factor = 1
         TIME_RESULTS[size] = (prev_time + (te - ts))/divide_factor
-        self.assertTrue(np.allclose(spdm, np.dot(result,
-                                                 np.transpose(result))))
+        self.assertTrue(np.allclose(result, np.linalg.cholesky(spdm)))
 
 
 if __name__ == '__main__':
