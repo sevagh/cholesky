@@ -13,16 +13,16 @@ TIME_RESULTS = {}
 
 
 class CholeskyTester(unittest.TestCase):
-    def __init__(self, testname, cholesky_lib):
+    def __init__(self, testname, cholesky_libs):
         super(CholeskyTester, self).__init__(testname)
-        self.cholesky = cholesky_lib
+        self.choleskies = cholesky_libs
 
     @given(arrays(np.double,
                   array_shapes(min_dims=2, max_dims=2,
                                min_side=3, max_side=2048),
                   elements=st.floats(0, 1000, allow_nan=False)))
     @settings(deadline=None)
-    @settings(max_iterations=10000)
+    @settings(max_examples=100)
     def test_rand(self, a):
         global TIME_RESULTS
         assume(a.shape[0] == a.shape[1])
@@ -33,6 +33,7 @@ class CholeskyTester(unittest.TestCase):
         result = np.zeros((size, size), order='C')
         spdm_ptr = spdm.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
         result_ptr = result.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
+        # this part should loop around all choleskies
         ts = time.time()
         self.cholesky.cholesky(spdm_ptr, result_ptr, size)
         te = time.time()
@@ -43,24 +44,25 @@ class CholeskyTester(unittest.TestCase):
             prev_time = 0.0
             divide_factor = 1
         TIME_RESULTS[size] = (prev_time + (te - ts))/divide_factor
-        self.assertTrue(np.allclose(result, np.linalg.cholesky(spdm)))
+        self.assertTrue(np.allclose(result, np.linalg.cholesky(spdm),
+                                    rtol=0.001,
+                                    atol=0.001))
 
 
 if __name__ == '__main__':
-    try:
-        artifact = sys.argv[1]
-    except IndexError:
-        print('Re-run with:\t{0} <path-to-cholesky-.so>', file=sys.stderr)
+    artifacts = sys.argv[1:]
+    if not len(artifacts):
+        print('Re-run with:\t{0} cholesky1.so cholesky2.so ...'.format(
+            sys.argv[0]), file=sys.stderr)
         sys.exit(1)
-    loaded_artifact = ctypes.cdll.LoadLibrary(artifact)
 
-    print('Running testbench for: {0}'.format(artifact.split('/')[-1]))
+    a_ = {a: ctypes.cdll.LoadLibrary(a) for a in artifacts}
+
     test_loader = unittest.TestLoader()
-    test_names = test_loader.getTestCaseNames(CholeskyTester)
-
     suite = unittest.TestSuite()
-    for test_name in test_names:
-        suite.addTest(CholeskyTester(test_name, loaded_artifact))
+
+    [suite.addTest(CholeskyTester(t, a_)) for t in
+        test_loader.getTestCaseNames(CholeskyTester)]
 
     ret = unittest.TextTestRunner().run(suite).wasSuccessful()
 

@@ -1,8 +1,5 @@
 #include <math.h>
 #include <omp.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 void
 cholesky(double *A, double *L, int n)

@@ -1,6 +1,4 @@
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 void
 cholesky(double *A, double *L, int n)
