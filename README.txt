@@ -1,8 +1,8 @@
 Author: Sevag Hanssian <sevag.hanssian@gmail.com>
 
-=====
-Intro
-=====
+============
+Introduction
+============
 
 Some Cholesky matrix decomposition implementations and a Python hypothesis testbench.
 
@@ -23,7 +23,7 @@ Usage (for a 32x32 matrix):
 
     $ make
     $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/intel/mkl/lib/intel64_lin:/opt/intel/lib/intel64_lin:/usr/lib64/openmpi/lib
-    $ ./testbench.py 32 lib/libx.so
+    $ ./test/testbench.py 32 lib/lib*
 
 Outputs:
 
@@ -43,8 +43,4 @@ Copyright: Sevag Hanssian 2017 <sevag.hanssian@gmail.com>
 Special notes
 =============
 
-Intel MKL (https://software.intel.com/en-us/mkl) is not easy to get working. I had to settle for installing all of the RPMs in the tarball (not just running the Intel installer).
-
-    $ sudo find /usr/ -type f -name '*.so*' -exec sh -c "objdump -T {} 2>&1 | grep -v '.*File format not recognized.*' | grep -e '.*pdpotrf.*' && echo {}" \;
-
-Also, there are dependencies on BLAS, LAPACK, SCALAPACK, BLACS, OpenMPI, MPICH, and others. The hardest part of this project was writing the Makefile for the C code.
+Find all notes and observations in `doc/` directory.

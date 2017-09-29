@@ -1,0 +1,20 @@
+`O0`, `O3`, `O3 + -ffast-math` differences detected for librosetta:
+
+    (cholesky) sevagh:cholesky $ ./test/testbench.py 100 lib/librosetta*
+    .
+    ----------------------------------------------------------------------
+    Ran 1 test in 26.880s
+
+    OK
+    {'lib/librosetta0.so': {'err': 1.8082267621785064e-09,
+                            'mem': 85.03893813571962,
+                            'runtime': 0.001163722701001497},
+     'lib/librosetta3.so': {'err': 1.8082267621785064e-09,
+                            'mem': 84.96201152614991,
+                            'runtime': 0.0003685370771775827},
+     'lib/librosettafastmath.so': {'err': 2.1106754000012571e-09,
+                                   'mem': 85.03594347869114,
+                                   'runtime': 0.00023657386228021358}}
+    (cholesky) sevagh:cholesky $
+
+O0 is the slowest. O3 is faster with the same error. `-ffast-math` is the fastest with higher error.

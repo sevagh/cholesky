@@ -1,0 +1,5 @@
+Intel MKL (https://software.intel.com/en-us/mkl) is not easy to get working. I had to settle for installing all of the RPMs in the tarball (not just running the Intel installer).
+
+    $ sudo find /usr/ -type f -name '*.so*' -exec sh -c "objdump -T {} 2>&1 | grep -v '.*File format not recognized.*' | grep -e '.*pdpotrf.*' && echo {}" \;
+
+Also, there are dependencies on BLAS, LAPACK, SCALAPACK, BLACS, OpenMPI, MPICH, and others. The hardest part of this project was writing the Makefile for the C code.
