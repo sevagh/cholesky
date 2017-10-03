@@ -1,0 +1,20 @@
+`O0`, `O3`, `O3 + -msoft-float`, `O3 + -ffast-math` differences detected for librosetta:
+
+    (cholesky) sevagh:cholesky $ ./test/testbench.py 10 lib/librosetta*
+    .
+    ----------------------------------------------------------------------
+    Ran 1 test in 20.010s
+
+    OK
+    {'lib/librosetta0.so': {'err': 7.2059983021346951e-11,
+                            'mem': 39.66384045001348,
+                            'runtime': 3.407153142484845e-05},
+     'lib/librosetta3.so': {'err': 7.2059983021346951e-11,
+                            'mem': 39.655951278950795,
+                            'runtime': 3.2796587268239134e-05},
+     'lib/librosettafastmath.so': {'err': 1.3349069530340519e-10,
+                                   'mem': 39.663840555254765,
+                                   'runtime': 3.538567083426024e-05},
+     'lib/librosettasoftfloat.so': {'err': 7.2059983021346951e-11,
+                                    'mem': 39.66279783592319,
+                                    'runtime': 3.4919402669004086e-05}}
