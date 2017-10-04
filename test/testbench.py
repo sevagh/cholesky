@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 import numpy as np
 from hypothesis import given, assume, settings
@@ -10,8 +11,18 @@ import unittest
 import timeit
 from memory_profiler import memory_usage
 from pprint import pprint
+from importlib import import_module
 
 RESULTS = {}
+
+sys.path.insert(0,
+                os.path.abspath(
+                    os.path.join(
+                        os.path.dirname(
+                            __file__),
+                        '../python')
+                    )
+                )
 
 
 def running_average(d, key, newval):
@@ -40,9 +51,13 @@ class CholeskyTester(unittest.TestCase):
         for name, cholesky_lib in self.choleskies.items():
             RESULTS[name] = RESULTS.get(name, {})
             out = np.zeros((size, size), order='C')
-            cholesky_call = lambda: cholesky_lib.cholesky(
-                spdm.ctypes.data_as(c.POINTER(c.c_double)),
-                out.ctypes.data_as(c.POINTER(c.c_double)), size)
+            if type(cholesky_lib) == c.CDLL:
+                cholesky_call = lambda: cholesky_lib.cholesky(
+                    spdm.ctypes.data_as(c.POINTER(c.c_double)),
+                    out.ctypes.data_as(c.POINTER(c.c_double)), size)
+            else:
+                cholesky_call = lambda: cholesky_lib.cholesky(
+                        spdm, out, size)
             t = timeit.timeit(cholesky_call, number=1)
             mem_usage = memory_usage(cholesky_call)
             running_average(RESULTS[name], 'err',
@@ -55,9 +70,14 @@ class CholeskyTester(unittest.TestCase):
 if __name__ == '__main__':
     try:
         size = int(sys.argv[1])
-        artifacts = {x: c.cdll.LoadLibrary(x) for x in sys.argv[2:]}
+        artifacts = {}
+        for x in sys.argv[2:]:
+            if x.endswith('.so'):
+                artifacts[x] = c.cdll.LoadLibrary(x)
+            elif x.endswith('.py') and '__init__' not in x:
+                artifacts[x] = import_module(x.split('.')[0].split('/')[1])
     except IndexError:
-        print('Re-run with:\t{0} N cholesky1.so cholesky2.so ...'.format(
+        print('Re-run with:\t{0} N cholesky1.so cholesky2.py ...'.format(
               sys.argv[0]), file=sys.stderr)
         sys.exit(1)
 
